@@ -11,6 +11,7 @@ import { auth } from "../services/firebase";
 
 export const AuthContext = createContext({
   currentUser: null,
+  pending: true,
   // eslint-disable-next-line no-unused-vars
   createUser: async (email, password) => {},
   // eslint-disable-next-line no-unused-vars
@@ -26,29 +27,40 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [pending, setPending] = useState(true);
 
-  const createUser = (email, password) =>
-    createUserWithEmailAndPassword(auth, email, password);
+  const createUser = (email, password) => {
+    setPending(true);
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
 
-  const loginUser = (email, password) =>
-    signInWithEmailAndPassword(auth, email, password);
+  const loginUser = (email, password) => {
+    setPending(true);
+    return signInWithEmailAndPassword(auth, email, password);
+  };
 
-  const logoutUser = () => signOut(auth);
+  const logoutUser = () => {
+    setPending(true);
+    return signOut(auth);
+  };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) =>
-      setCurrentUser(user)
-    );
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setPending(false);
+    });
+
     console.log(currentUser);
 
     return () => {
       unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, createUser, loginUser, logoutUser }}
+      value={{ currentUser, pending, createUser, loginUser, logoutUser }}
     >
       {children}
     </AuthContext.Provider>

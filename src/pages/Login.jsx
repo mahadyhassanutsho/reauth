@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { useLocation, useNavigate, Link } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { routes } from "../lib/router";
@@ -8,6 +8,9 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const [showPassword, setShowPassWord] = useState(false);
   const { loginUser } = useAuth();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleShowPassword = () =>
     setShowPassWord((showPassword) => !showPassword);
@@ -18,7 +21,11 @@ export default function Login() {
     const password = e.target.password.value;
 
     loginUser(email, password)
-      .then((result) => console.log(result.user))
+      .then((result) => {
+        console.log(result.user);
+        e.target.reset();
+        navigate(location.state || routes.home.path);
+      })
       .catch((e) => console.error(e));
   };
 
