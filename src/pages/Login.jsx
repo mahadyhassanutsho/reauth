@@ -1,8 +1,27 @@
+import { useState } from "react";
 import { Link } from "react-router";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { routes } from "../lib/router";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
+  const [showPassword, setShowPassWord] = useState(false);
+  const { loginUser } = useAuth();
+
+  const toggleShowPassword = () =>
+    setShowPassWord((showPassword) => !showPassword);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    loginUser(email, password)
+      .then((result) => console.log(result.user))
+      .catch((e) => console.error(e));
+  };
+
   return (
     <div className="hero bg-base-200 min-h-screen">
       <div className="hero-content flex-col lg:flex-row-reverse">
@@ -16,7 +35,7 @@ export default function Login() {
         </div>
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
           <div className="card-body">
-            <form>
+            <form onSubmit={handleLogin}>
               <fieldset className="fieldset">
                 <label className="label">Email</label>
                 <input
@@ -26,16 +45,29 @@ export default function Login() {
                   placeholder="Email"
                 />
                 <label className="label">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  className="input"
-                  placeholder="Password"
-                />
+                <div className="flex relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    className="input"
+                    placeholder="Password"
+                    required
+                    minLength={6}
+                  />
+                  <button
+                    className="btn btn-ghost z-10 absolute right-0 top-0 mr-4"
+                    type="button"
+                    onClick={toggleShowPassword}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
                 <div>
                   <a className="link link-hover">Forgot password?</a>
                 </div>
-                <button className="btn btn-neutral mt-4">Login</button>
+                <button className="btn btn-neutral mt-4" type="submit">
+                  Login
+                </button>
               </fieldset>
             </form>
             <p>

@@ -1,7 +1,17 @@
 import { Link, NavLink } from "react-router";
+
 import { routes } from "../../lib/router";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
+  const { currentUser, logoutUser } = useAuth();
+
+  const handleLogout = () => {
+    logoutUser()
+      .then(console.log("Logged out!"))
+      .catch((e) => console.error(e));
+  };
+
   return (
     <div className="navbar bg-base-100 shadow-sm justify-between">
       {/* Logo */}
@@ -26,37 +36,41 @@ export default function Navbar() {
       </ul>
 
       {/* User */}
-      <div className="dropdown dropdown-end">
-        <div
-          tabIndex={0}
-          role="button"
-          className="btn btn-ghost btn-circle avatar"
-        >
-          <div className="w-10 rounded-full">
-            <img
-              alt="Tailwind CSS Navbar component"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-            />
+      {currentUser && (
+        <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle avatar"
+          >
+            <div className="w-10 rounded-full">
+              <img
+                alt="Tailwind CSS Navbar component"
+                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+              />
+            </div>
           </div>
+          <ul
+            tabIndex="-1"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow gap-2"
+          >
+            <li>
+              <Link className="justify-between">
+                Profile
+                <span className="badge">New</span>
+              </Link>
+            </li>
+            <li>
+              <Link>Settings</Link>
+            </li>
+            <li>
+              <button onClick={handleLogout} className="btn btn-sm btn-error">
+                Logout
+              </button>
+            </li>
+          </ul>
         </div>
-        <ul
-          tabIndex="-1"
-          className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-        >
-          <li>
-            <Link className="justify-between">
-              Profile
-              <span className="badge">New</span>
-            </Link>
-          </li>
-          <li>
-            <Link>Settings</Link>
-          </li>
-          <li>
-            <Link>Logout</Link>
-          </li>
-        </ul>
-      </div>
+      )}
     </div>
   );
 }

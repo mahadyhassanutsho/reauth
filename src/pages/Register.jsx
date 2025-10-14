@@ -1,30 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { routes } from "../lib/router";
-import { auth } from "../services/firebase";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const [showPassword, setShowPassWord] = useState(false);
+  const { createUser } = useAuth();
 
   const toggleShowPassword = () =>
     setShowPassWord((showPassword) => !showPassword);
 
   const handleRegister = (e) => {
     e.preventDefault();
-    // const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    createUserWithEmailAndPassword(auth, email, password)
+    createUser(email, password)
       .then((result) => console.log(result.user))
-      .catch((e) => {
-        {
-          throw new Error(e);
-        }
-      });
+      .catch((e) => console.error(e));
   };
 
   return (
@@ -44,14 +39,6 @@ export default function Register() {
               <fieldset className="fieldset">
                 <label className="label">Name</label>
                 <input
-                  type="text"
-                  name="name"
-                  className="input"
-                  placeholder="Name"
-                  required
-                />
-                <label className="label">Name</label>
-                <input
                   type="email"
                   name="email"
                   className="input"
@@ -69,6 +56,7 @@ export default function Register() {
                   />
                   <button
                     className="btn btn-ghost z-10 absolute right-0 top-0 mr-4"
+                    type="button"
                     onClick={toggleShowPassword}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -77,7 +65,9 @@ export default function Register() {
                 <div>
                   <a className="link link-hover">Forgot password?</a>
                 </div>
-                <button className="btn btn-neutral mt-4">Register</button>
+                <button className="btn btn-neutral mt-4" type="submit">
+                  Register
+                </button>
               </fieldset>
             </form>
             <p>
