@@ -21,8 +21,7 @@ export default function Login() {
     const password = e.target.password.value;
 
     loginUser(email, password)
-      .then((result) => {
-        console.log(result.user);
+      .then(() => {
         e.target.reset();
         navigate(location.state || routes.home.path);
       })

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { routes } from "../lib/router";
@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Register() {
   const [showPassword, setShowPassWord] = useState(false);
   const { createUser } = useAuth();
+  const navigate = useNavigate();
 
   const toggleShowPassword = () =>
     setShowPassWord((showPassword) => !showPassword);
@@ -18,7 +19,9 @@ export default function Register() {
     const password = e.target.password.value;
 
     createUser(email, password)
-      .then((result) => console.log(result.user))
+      .then(() => {
+        navigate(routes.profile.path);
+      })
       .catch((e) => console.error(e));
   };
 

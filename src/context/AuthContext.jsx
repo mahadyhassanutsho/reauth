@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { use, useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
@@ -12,37 +12,20 @@ import { auth } from "../services/firebase";
 export const AuthContext = createContext({
   currentUser: null,
   pending: true,
-  // eslint-disable-next-line no-unused-vars
-  createUser: async (email, password) => {},
-  // eslint-disable-next-line no-unused-vars
-  loginUser: async (email, password) => {},
+  createUser: async () => {},
+  loginUser: async () => {},
   logoutUser: async () => {},
 });
 
 export const useAuth = () => {
-  const auth = use(AuthContext);
-  if (!auth) throw new Error("Cannot use useAuth outside of AuthProvider");
-  return auth;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
 };
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [pending, setPending] = useState(true);
-
-  const createUser = (email, password) => {
-    setPending(true);
-    return createUserWithEmailAndPassword(auth, email, password);
-  };
-
-  const loginUser = (email, password) => {
-    setPending(true);
-    return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const logoutUser = () => {
-    setPending(true);
-    return signOut(auth);
-  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -50,13 +33,23 @@ export const AuthProvider = ({ children }) => {
       setPending(false);
     });
 
-    console.log(currentUser);
-
-    return () => {
-      unsubscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => unsubscribe();
   }, []);
+
+  const createUser = async (email, password) => {
+    setPending(true);
+    await createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  const loginUser = async (email, password) => {
+    setPending(true);
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const logoutUser = async () => {
+    setPending(true);
+    await signOut(auth);
+  };
 
   return (
     <AuthContext.Provider
